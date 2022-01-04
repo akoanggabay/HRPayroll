@@ -56,9 +56,18 @@ export default ({ setAuth }) => {
           toast.success("Logged in Successfully",{
             position: toast.POSITION.TOP_CENTER
           });
+        }
+        else
+        {
+          toast.error(parseRes,{
+            position: toast.POSITION.TOP_CENTER
+          });
         } 
       } catch (err) {
         console.error(err.message);
+        toast.error(err.message,{
+          position: toast.POSITION.TOP_CENTER
+        });
       }
       //console.log(logged)
     };
