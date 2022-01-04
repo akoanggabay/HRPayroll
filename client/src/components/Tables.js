@@ -101,9 +101,9 @@ export const BioLogs = (props) => {
               {
                 BADGENUMBER: parseRes[i].BADGENUMBER,
                 Date: moment(parseRes[i].Date).format("YYYY-MM-DD"),
-                ClockIn: parseRes[i].ClockIn ? moment(parseRes[i].ClockIn).add(4,'h').format("YYYY-MM-DD hh:mm") : "",
+                ClockIn: parseRes[i].ClockIn ? moment(parseRes[i].ClockIn).add(4,'h').format("YYYY-MM-DD HH:mm") : "",
                 ClockInType: parseRes[i].ClockInType,
-                ClockOut: parseRes[i].ClockOut ? moment(parseRes[i].ClockOut).add(4,'h').format("YYYY-MM-DD hh:mm") : "",
+                ClockOut: parseRes[i].ClockOut ? moment(parseRes[i].ClockOut).add(4,'h').format("YYYY-MM-DD HH:mm") : "",
                 ClockOutType: parseRes[i].ClockOutType
               }
             )
@@ -170,9 +170,9 @@ export const BioLogs = (props) => {
             {
               BADGENUMBER: parseRes[i].BADGENUMBER,
               Date: moment(parseRes[i].Date).format("YYYY-MM-DD"),
-              ClockIn: parseRes[i].ClockIn ? moment(parseRes[i].ClockIn).add(4,'h').format("YYYY-MM-DD hh:mm") : "",
+              ClockIn: parseRes[i].ClockIn ? moment(parseRes[i].ClockIn).subtract(8,'h').format("YYYY-MM-DD HH:mm") : "",
               ClockInType: parseRes[i].ClockInType,
-              ClockOut: parseRes[i].ClockOut ? moment(parseRes[i].ClockOut).add(4,'h').format("YYYY-MM-DD hh:mm") : "",
+              ClockOut: parseRes[i].ClockOut ? moment(parseRes[i].ClockOut).subtract(8,'h').format("YYYY-MM-DD HH:mm") : "",
               ClockOutType: parseRes[i].ClockOutType
             }
           )
@@ -231,7 +231,7 @@ export const BioLogs = (props) => {
                             <Form.Control
                               required
                               type="text"
-                              value={start ? moment(start).format("YYYY-MM-DD hh:mm:ss a") : ""}
+                              value={start ? moment(start).format("YYYY-MM-DD HH:mm:ss") : ""}
                               placeholder="YYYY-MM-DD"
                               onFocus={openCalendar}
                               onChange={closeCalendar}  
@@ -259,7 +259,7 @@ export const BioLogs = (props) => {
                             <Form.Control
                               required
                               type="text"
-                              value={end ? moment(end).format("YYYY-MM-DD hh:mm:ss a") : ""}
+                              value={end ? moment(end).format("YYYY-MM-DD HH:mm:ss") : ""}
                               placeholder="YYYY-MM-DD"
                               onFocus={openCalendar}
                               onChange={() => { }} />
@@ -307,9 +307,9 @@ export const BioLogs = (props) => {
                   <tr key={i}>
                     <td>{log.BADGENUMBER}</td>
                     <td>{moment(log.Date).format("YYYY-MM-DD")}</td>
-                    <td>{log.ClockIn !== "" ? moment(log.ClockIn).format("YYYY-MM-DD hh:mm:ss") : ""}</td>
+                    <td>{log.ClockIn !== "" ? moment(log.ClockIn).format("YYYY-MM-DD hh:mm:ss a") : ""}</td>
                     <td>{log.ClockInType}</td>
-                    <td>{log.ClockOut !== "" ? moment(log.ClockOut).format("YYYY-MM-DD hh:mm:ss") : ""}</td>
+                    <td>{log.ClockOut !== "" ? moment(log.ClockOut).format("YYYY-MM-DD hh:mm:ss a") : ""}</td>
                     <td>{log.ClockOutType}</td>
                   </tr>
                 )}
