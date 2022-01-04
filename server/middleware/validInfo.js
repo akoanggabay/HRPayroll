@@ -19,7 +19,7 @@ module.exports = function(req, res, next) {
   }
 
   else if (req.path === "/obaddrequest") {
-    console.log(req.body)
+    //console.log(req.body)
     if (![idno,com].every(Boolean)) {
       return res.status(505).json("Login Session expired! Please relogin.");
     }

@@ -101,9 +101,9 @@ export const BioLogs = (props) => {
               {
                 BADGENUMBER: parseRes[i].BADGENUMBER,
                 Date: moment(parseRes[i].Date).format("YYYY-MM-DD"),
-                ClockIn: parseRes[i].ClockIn ? moment(parseRes[i].ClockIn).add(4,'h').format("YYYY-MM-DD HH:mm") : "",
+                ClockIn: parseRes[i].ClockIn ? moment(parseRes[i].ClockIn).subtract(8,'h').format("YYYY-MM-DD hh:mm a") : "",
                 ClockInType: parseRes[i].ClockInType,
-                ClockOut: parseRes[i].ClockOut ? moment(parseRes[i].ClockOut).add(4,'h').format("YYYY-MM-DD HH:mm") : "",
+                ClockOut: parseRes[i].ClockOut ? moment(parseRes[i].ClockOut).subtract(8,'h').format("YYYY-MM-DD hh:mm a") : "",
                 ClockOutType: parseRes[i].ClockOutType
               }
             )
@@ -306,10 +306,10 @@ export const BioLogs = (props) => {
                 {logs.map((log,i) =>
                   <tr key={i}>
                     <td>{log.BADGENUMBER}</td>
-                    <td>{moment(log.Date).format("YYYY-MM-DD")}</td>
-                    <td>{log.ClockIn !== "" ? moment(log.ClockIn).format("YYYY-MM-DD hh:mm:ss a") : ""}</td>
+                    <td>{log.Date}</td>
+                    <td>{log.ClockIn !== "" ? log.ClockIn : ""}</td>
                     <td>{log.ClockInType}</td>
-                    <td>{log.ClockOut !== "" ? moment(log.ClockOut).format("YYYY-MM-DD hh:mm:ss a") : ""}</td>
+                    <td>{log.ClockOut !== "" ? log.ClockOut : ""}</td>
                     <td>{log.ClockOutType}</td>
                   </tr>
                 )}

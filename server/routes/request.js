@@ -5,6 +5,7 @@ const mssql = require('mssql');
 const validInfo = require("../middleware/validInfo");
 const authorize = require("../middleware/authorize");
 const zeroPad = (num, places) => String(num).padStart(places, '0');
+const moment = require("moment");
 
 function APILog(method,url)
 {
@@ -95,13 +96,16 @@ router.get("/otgetallrequest", authorize, async (req, res) => {
 // Start OB API Request -----------------------------------------------------
 
 router.post("/obaddrequest", validInfo, authorize, async (req, res) => {
-    console.log(req.body)
+    //console.log(req.body)
     
     let lastOBreq;
     //console.log(lastOTreq)
     try {
-        const lastOB = await sql.query("SELECT transno FROM OBRequest where transno like 'OB"+new Date().getFullYear()+"%' order by transno desc");
-        //console.log(lastOB.rowsAffected[0])
+        const lastOB = await sql.query("SELECT transno FROM OBRequest where transno like 'OB"+new Date().getFullYear()+"%' order by transno desc")
+        const userid = await sql.query("SELECT USERID FROM USERINFO where BADGENUMBER = '"+req.body.idno+"'")
+        //console.log(userid.recordsets[0][0].USERID)
+
+        console.log(moment(req.body.datefrom +" "+req.body.timefrom).add(2,'d').format("YYYY-MM-DD hh:mm"))
         if(lastOB.rowsAffected[0] > 0)
         {
             
@@ -128,9 +132,23 @@ router.post("/obaddrequest", validInfo, authorize, async (req, res) => {
         .input('approver',mssql.VarChar,"1ST LEVEL")
         .query("INSERT into OBRequest (transno,idno,ccode,datefrom,dateto,timefrom,timeto,details,remarks,status,approver,datefiled,lastupdate) values (@transno,@idno,@ccode,@datefrom,@dateto,@timefrom,@timeto,@details,@remarks,@status,@approver,GETDATE(),GETDATE()) ")
         APILog(req.route.stack[0].method,req.originalUrl)
-        console.log(data.rowsAffected[0]);
+        //console.log(data.rowsAffected[0]);
         if(data.rowsAffected[0] > 0 )
         {
+
+            
+
+            /* for (let i = 0; i <= req.body.nod; i++) {
+
+                const timeinout = await sql.request()
+                .input('USERID',mssql.VarChar,userid.recordsets[0][0].USERID)
+                .input('CHECKTIME',mssql.DateTime,req.body.idno)
+                .input('ccode',mssql.VarChar,req.body.com)
+                .query("INSERT into CHECKINOUT (transno,idno,ccode,datefrom,dateto,timefrom,timeto,details,remarks,status,approver,datefiled,lastupdate) values (@transno,@idno,@ccode,@datefrom,@dateto,@timefrom,@timeto,@details,@remarks,@status,@approver,GETDATE(),GETDATE()) ")
+            
+                console.log(moment(req.body.datefrom).add(i,'d').format("YYYY-MM-DD"))
+            } */
+
             return res.send({
                 res: data.recordsets,
                 status: 200,

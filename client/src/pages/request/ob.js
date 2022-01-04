@@ -40,9 +40,8 @@ const onSubmitForm = async e => {
 
     try 
         {
-
+            alert(moment.duration(end.diff(start)).asDays())
         const othours = moment(end,"YYYY-MM-DD HH:mm").diff(start)
-        alert(othours / (3600 * 1000))
         //alert(moment(date + " "+ start).format("YYYY-MM-DD hh:mm a") + " "+moment(start).format("hh:mm a"))
         if(moment(starttime).format("HH:mm") > moment(endtime).format("HH:mm"))
         {
@@ -68,7 +67,8 @@ const onSubmitForm = async e => {
                         timefrom:moment(starttime).format("HH:mm:ss"),
                         timeto: moment(endtime).format("HH:mm:ss"),
                         details: inputs.details,
-                        remarks:inputs.remarks 
+                        remarks:inputs.remarks,
+                        nod: moment.duration(end.diff(start)).asDays()
                     };
         const response = await fetch(link+"api/v1/request/obaddrequest",
         {
