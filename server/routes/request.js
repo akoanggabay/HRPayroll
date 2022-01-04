@@ -162,7 +162,7 @@ router.get("/obgetallrequest", authorize, async (req, res) => {
         .input('ccode',mssql.VarChar,req.user.id.com)
         .query("SELECT * from OBRequest where idno = @idno and ccode= @ccode")
         APILog(req.route.stack[0].method,req.originalUrl)
-        //console.log(data.recordsets[0])
+        console.log(req.socket.remoteAddress)
         return res.send({
             res: data.recordsets[0]
         })

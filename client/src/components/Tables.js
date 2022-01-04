@@ -1,7 +1,7 @@
 
 import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Card, Col, Form, InputGroup, Row, Table } from '@themesberg/react-bootstrap';
+import { Button, Card, Col, Container, Form, InputGroup, Row, Table } from '@themesberg/react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "datatables.net-buttons/js/buttons.colVis.js";
 import "datatables.net-buttons/js/buttons.flash.js";
@@ -12,11 +12,11 @@ import "datatables.net-dt/css/jquery.dataTables.css";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 //Datatable Modules
 import "datatables.net-dt/js/dataTables.dataTables";
-import $ from 'jquery';
 import 'jquery/dist/jquery.min.js';
 import moment from "moment-timezone";
 import React, { useEffect, useRef, useState } from "react";
 import Datetime from "react-datetime";
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { useSelector } from 'react-redux';
 import { toast } from "react-toastify";
 import "../../node_modules/react-data-table-component-extensions/dist/index.css";
@@ -69,7 +69,7 @@ export const BioLogs = (props) => {
   const [tableData, setTableData] = useState({});
 
   async function getlogs() {
-      
+
       try {
           
         if(moment(start).format("YYYY-MM-DD HH:mm") > moment(end).format("YYYY-MM-DD HH:mm"))
@@ -110,18 +110,7 @@ export const BioLogs = (props) => {
           }
           setLogs(data);
           setTableData({columns: columns,data:data})
-          $(document).ready(function () {
-            
-            $('#testtable').DataTable(
-                {
-                  pageLength: 5,
-                  dom: 'Bfrtip',
-                      buttons: ['copy', 'csv', 'print'
-                      ]
-                }
-            );
-             
-          });
+          
         
       } catch (err) {
         //console.error(err.message);
@@ -136,18 +125,6 @@ export const BioLogs = (props) => {
       btnGen.current.click();
     }.bind(this), 200) */
     getlogs();
-    $(document).ready(function () {
-            
-      $('#testtable').DataTable(
-          {
-            pageLength: 5,
-            dom: 'Bfrtip',
-                buttons: ['copy', 'csv', 'print'
-                ]
-          }
-      );
-       
-    });
   },[]);
   
   async function generatelogs() {
@@ -233,109 +210,114 @@ export const BioLogs = (props) => {
   
   return (
 
-    <Card border="light" className="shadow-sm mb-4">
-      <Card.Body className="pb-0">
-        <Form>
-          <Row className="align-items-center">
-            <Col md={4} className="mb-3">
-              <Form.Group id="start">
-                <Row>
-                  <Col md={3} className="mb-3">
-                    <Form.Label>Start Date</Form.Label>
-                  </Col>
-                  <Col md={9} className="mb-3">
-                    <Datetime
-                      timeFormat={true}
-                      onChange={setStart}
-                      renderInput={(props, openCalendar, closeCalendar) => (
-                        <InputGroup>
-                          <InputGroup.Text><FontAwesomeIcon icon={faCalendarAlt} /></InputGroup.Text>
-                          <Form.Control
-                            required
-                            type="text"
-                            value={start ? moment(start).format("YYYY-MM-DD hh:mm:ss a") : ""}
-                            placeholder="YYYY-MM-DD"
-                            onFocus={openCalendar}
-                            onChange={closeCalendar}  
-                            />
-                            
-                        </InputGroup>
-                      )} />
+    <Container fluid className="px-0">
+      <Card border="light" className="shadow-sm mb-4">
+        <Card.Body className="p-3">
+          <Form>
+            <Row className="align-items-center">
+              <Col md={4} className="">
+                <Form.Group id="start">
+                  <Row>
+                    <Col md={3} className="">
+                      <Form.Label>Start Date</Form.Label>
                     </Col>
-                  </Row>
-              </Form.Group>
-            </Col>
-            <Col md={4} className="mb-3">
-              <Form.Group id="end">
-                <Row>
-                  <Col md={3} className="mb-3">
-                    <Form.Label>End Date</Form.Label>
-                  </Col>
-                  <Col md={9} className="mb-3">
-                    <Datetime
-                      timeFormat={true}
-                      onChange={setEnd}
-                      renderInput={(props, openCalendar) => (
-                        <InputGroup>
-                          <InputGroup.Text><FontAwesomeIcon icon={faCalendarAlt} /></InputGroup.Text>
-                          <Form.Control
-                            required
-                            type="text"
-                            value={end ? moment(end).format("YYYY-MM-DD hh:mm:ss a") : ""}
-                            placeholder="YYYY-MM-DD"
-                            onFocus={openCalendar}
-                            onChange={() => { }} />
-                        </InputGroup>
-                      )} />
+                    <Col md={9} className="">
+                      <Datetime
+                        timeFormat={true}
+                        onChange={setStart}
+                        renderInput={(props, openCalendar, closeCalendar) => (
+                          <InputGroup>
+                            <InputGroup.Text><FontAwesomeIcon icon={faCalendarAlt} /></InputGroup.Text>
+                            <Form.Control
+                              required
+                              type="text"
+                              value={start ? moment(start).format("YYYY-MM-DD hh:mm:ss a") : ""}
+                              placeholder="YYYY-MM-DD"
+                              onFocus={openCalendar}
+                              onChange={closeCalendar}  
+                              />
+                              
+                          </InputGroup>
+                        )} />
+                      </Col>
+                    </Row>
+                </Form.Group>
+              </Col>
+              <Col md={4} className="">
+                <Form.Group id="end">
+                  <Row>
+                    <Col md={3} className="">
+                      <Form.Label>End Date</Form.Label>
                     </Col>
-                  </Row>
-              </Form.Group>
+                    <Col md={9} className="">
+                      <Datetime
+                        timeFormat={true}
+                        onChange={setEnd}
+                        renderInput={(props, openCalendar) => (
+                          <InputGroup>
+                            <InputGroup.Text><FontAwesomeIcon icon={faCalendarAlt} /></InputGroup.Text>
+                            <Form.Control
+                              required
+                              type="text"
+                              value={end ? moment(end).format("YYYY-MM-DD hh:mm:ss a") : ""}
+                              placeholder="YYYY-MM-DD"
+                              onFocus={openCalendar}
+                              onChange={() => { }} />
+                          </InputGroup>
+                        )} />
+                      </Col>
+                    </Row>
+                </Form.Group>
+              </Col>
+
+              <Col md={2}>
+              <Button variant="primary" type="button" ref={btnGen} className="w-70" style={{float: 'right'}} onClick={generatelogs}>
+                Generate Logs
+              </Button>
             </Col>
-          </Row>
-          <Col md={8}>
-            <Button variant="primary" type="button" ref={btnGen} className="w-70" style={{float: 'right'}} onClick={generatelogs}>
-              Generate Logs
-            </Button>
-          </Col>
-        </Form>
-      </Card.Body>
-      <Card.Body className="pb-0">
-        <Table responsive className="table-centered table-nowrap rounded mb-0" id="testtable">
-          <thead className="thead-light">
-            <tr>
-              <th className="border-0">ID Number</th>
-              <th className="border-0">Date</th>
-              <th className="border-0">Time In</th>
-              <th className="border-0">Time In Transaction Type</th>
-              <th className="border-0">Time Out</th>
-              <th className="border-0">Time Out Transaction Type</th>
-            </tr>
-          </thead>
-          <tbody>
-              {logs.map((log,i) =>
-                <tr key={i}>
-                  <td>{log.BADGENUMBER}</td>
-                  <td>{moment(log.Date).format("YYYY-MM-DD")}</td>
-                  <td>{log.ClockIn !== "" ? moment(log.ClockIn).format("YYYY-MM-DD hh:mm:ss") : ""}</td>
-                  <td>{log.ClockInType}</td>
-                  <td>{log.ClockOut !== "" ? moment(log.ClockOut).format("YYYY-MM-DD hh:mm:ss") : ""}</td>
-                  <td>{log.ClockOutType}</td>
-                </tr>
-              )}
-          </tbody>
-        </Table>
-        {/* <DataTableExtensions {...tableData}>
-          <DataTable
-            columns={columns}
-            data={data}
-            defaultSortField="Date"
-            defaultSortAsc={false}
-            pagination
-            highlightOnHover
-          />
-        </DataTableExtensions> */}
-      </Card.Body>
-    </Card>
+            </Row>
+            
+          </Form>
+        </Card.Body>
+        
+      </Card>
+
+      <Card>
+        <Card.Body className="p-3">
+          <ReactHTMLTableToExcel
+            variant="primary"
+            id="test-table-xls-button"
+            className="download-table-xls-button btn btn-info mb-3"
+            table="table-to-xls"
+            filename="Biometrics Logs"
+            buttonText="Export Data"/>
+          <Table responsive className="table-centered table-nowrap rounded mb-0" id="table-to-xls">
+            <thead className="thead-light">
+              <tr>
+                <th className="border-0">ID Number</th>
+                <th className="border-0">Date</th>
+                <th className="border-0">Time In</th>
+                <th className="border-0">Time In Transaction Type</th>
+                <th className="border-0">Time Out</th>
+                <th className="border-0">Time Out Transaction Type</th>
+              </tr>
+            </thead>
+            <tbody>
+                {logs.map((log,i) =>
+                  <tr key={i}>
+                    <td>{log.BADGENUMBER}</td>
+                    <td>{moment(log.Date).format("YYYY-MM-DD")}</td>
+                    <td>{log.ClockIn !== "" ? moment(log.ClockIn).format("YYYY-MM-DD hh:mm:ss") : ""}</td>
+                    <td>{log.ClockInType}</td>
+                    <td>{log.ClockOut !== "" ? moment(log.ClockOut).format("YYYY-MM-DD hh:mm:ss") : ""}</td>
+                    <td>{log.ClockOutType}</td>
+                  </tr>
+                )}
+            </tbody>
+          </Table>
+        </Card.Body>
+      </Card>
+    </Container>
   );
 };
 

@@ -4,7 +4,7 @@ const sql = require("mssql");
 const config = {
     user: 'duane',
     password: "duanepogi",
-    server: "10.168.2.5\\SQLexpress",
+    server: "10.168.2.8\\SQLexpress",
     database: "Biometrics",
     port: 1433,
     options: {

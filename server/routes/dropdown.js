@@ -5,6 +5,7 @@ const pool = require("../mariadb");
 const validInfo = require("../middleware/validInfo");
 const jwtGenerator = require("../utils/jwtGenerator");
 const authorize = require("../middleware/authorize");
+const sql = require("../msdb");
 
 //authorizeentication
 /* pool.connect((error) => {
@@ -25,6 +26,24 @@ router.get("/company", async (req, res) => {
         console.error(err.message);
         res.status(500).send("Server error");
       }
+});
+
+router.get("/leave", authorize ,async (req, res) => {
+  try {
+
+      const data = await sql.request()
+        .query("SELECT * from leave order by description")
+
+        
+        //console.log(data.recordsets[0])
+        return res.send({
+            res: data.recordsets[0]
+        })
+  
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server error");
+    }
 });
 
 module.exports = router;
