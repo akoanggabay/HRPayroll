@@ -35,4 +35,13 @@ export const Routes = {
     OT: { path: "/request/ot" },
     OB: { path: "/request/ob" },
     Leave: { path: "/request/leave" },
+    Req: { path: "/request/request" },
+
+    // Forms
+
+    FormLeave: { path: "/form/leave" },
+
+    // User Profile
+
+    UserProfile: { path: "/user/profile" },
 };

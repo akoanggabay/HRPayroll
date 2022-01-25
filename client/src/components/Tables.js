@@ -1,5 +1,5 @@
 
-import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Card, Col, Container, Form, InputGroup, Row, Table } from '@themesberg/react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -20,6 +20,7 @@ import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { useSelector } from 'react-redux';
 import { toast } from "react-toastify";
 import "../../node_modules/react-data-table-component-extensions/dist/index.css";
+import { Link } from "../link";
 
 
 
@@ -35,11 +36,6 @@ export const BioLogs = (props) => {
   
   const columns = [
     {
-      name: "Id number",
-      selector: row => row["BADGENUMBER"],
-      sortable: true
-    },
-    {
       name: "Date",
       selector: row => row["Date"],
       sortable: true
@@ -50,18 +46,18 @@ export const BioLogs = (props) => {
       sortable: true,
     },
     {
-      name: "ClockInType",
-      selector: row => row["ClockInType"],
-      sortable: true
-    },
-    {
       name: "ClockOut",
       selector: row => row["ClockOut"],
       sortable: true
     },
     {
-      name: "ClockOutType",
-      selector: row => row["ClockOutType"],
+      name: "TransactionType",
+      selector: row => row["TransactionType"],
+      sortable: true
+    },
+    {
+      name: "Details",
+      selector: row => row["Details"],
       sortable: true
     }
   ];
@@ -79,7 +75,7 @@ export const BioLogs = (props) => {
             });
             return false;
         }
-          const res = await fetch(link+"api/v1/logs/filodatebetween/"+moment(start).format("YYYY-MM-DD")+"/"+moment(end).format("YYYY-MM-DD"), {
+          const res = await fetch(Link+"api/v1/logs/filodatebetween/"+moment(start).format("YYYY-MM-DD")+"/"+moment(end).format("YYYY-MM-DD"), {
             method: "GET",
             headers: { jwt_token: localStorage.token }
           });
@@ -94,17 +90,17 @@ export const BioLogs = (props) => {
           }
 
           let data = [];
-        
+          let dets;
           for(let i=0;i< parseRes.length; i++)
           {
+            //dets = await LogsDetails(parseRes[i].BADGENUMBER,moment(parseRes[i].ClockIn).subtract(8,'h').format("YYYY-MM-DD HH:mm:ss"))
             data.push(
               {
-                BADGENUMBER: parseRes[i].BADGENUMBER,
                 Date: moment(parseRes[i].Date).format("YYYY-MM-DD"),
                 ClockIn: parseRes[i].ClockIn ? moment(parseRes[i].ClockIn).subtract(8,'h').format("YYYY-MM-DD hh:mm a") : "",
-                ClockInType: parseRes[i].ClockInType,
                 ClockOut: parseRes[i].ClockOut ? moment(parseRes[i].ClockOut).subtract(8,'h').format("YYYY-MM-DD hh:mm a") : "",
-                ClockOutType: parseRes[i].ClockOutType
+                TransactionType: parseRes[i].description,
+                Details: parseRes[i].details
               }
             )
           }
@@ -118,6 +114,21 @@ export const BioLogs = (props) => {
     
     
   };
+
+   const LogsDetails = async function (userid,checktime) {
+    const res = await fetch(Link+"api/v1/logs/getdetails/"+userid+"/"+moment(checktime).format("YYYY-MM-DD HH:mm:ss"), {
+      method: "GET",
+      headers: { jwt_token: localStorage.token }
+    });
+
+    const parseRes = await res.json();
+    
+    return new Promise((resolve, reject) => {
+      setTimeout(resolve, 10, parseRes);
+    }).then(async values => {
+      return values
+    });
+  }
 
 
   useEffect(() => {
@@ -138,7 +149,7 @@ export const BioLogs = (props) => {
             });
             return false;
         }
-        const res = await fetch(link+"api/v1/logs/filodatebetween/"+moment(start).format("YYYY-MM-DD")+"/"+moment(end).format("YYYY-MM-DD"), {
+        const res = await fetch(Link+"api/v1/logs/filodatebetween/"+moment(start).format("YYYY-MM-DD")+"/"+moment(end).format("YYYY-MM-DD"), {
           method: "GET",
           headers: { jwt_token: localStorage.token }
         });
@@ -162,18 +173,27 @@ export const BioLogs = (props) => {
         
         let data = [];
         
-        
+        let dets;
         
         for(let i=0;i< parseRes.length; i++)
         {
+          //console.log(moment(parseRes[i].ClockOut).subtract(8,'h').format("YYYY-MM-DD HH:mm:ss"))
+          /* if(parseRes[i].ClockIn)
+          {
+            dets = await LogsDetails(parseRes[i].BADGENUMBER,moment(parseRes[i].ClockIn).subtract(8,'h').format("YYYY-MM-DD HH:mm:ss"))
+          }
+          else
+          {
+            dets = {details: "Office",type: "Biometrics"}
+          } */
+          
           data.push(
             {
-              BADGENUMBER: parseRes[i].BADGENUMBER,
               Date: moment(parseRes[i].Date).format("YYYY-MM-DD"),
-              ClockIn: parseRes[i].ClockIn ? moment(parseRes[i].ClockIn).subtract(8,'h').format("YYYY-MM-DD HH:mm") : "",
-              ClockInType: parseRes[i].ClockInType,
-              ClockOut: parseRes[i].ClockOut ? moment(parseRes[i].ClockOut).subtract(8,'h').format("YYYY-MM-DD HH:mm") : "",
-              ClockOutType: parseRes[i].ClockOutType
+              ClockIn: parseRes[i].ClockIn ? moment(parseRes[i].ClockIn).subtract(8,'h').format("YYYY-MM-DD hh:mm a") : "",
+              ClockOut: parseRes[i].ClockOut ? moment(parseRes[i].ClockOut).subtract(8,'h').format("YYYY-MM-DD hh:mm a") : "",
+              TransactionType: parseRes[i].description,
+              Details: parseRes[i].details
             }
           )
         }
@@ -194,18 +214,25 @@ export const BioLogs = (props) => {
     }
   }
 
-  const data = [
-    {
-      BADGENUMBER: "1037",
-      Date: "Beetlejuice",
-      ClockIn: "1988",
-      ClockInType: "92",
-      ClockOut: "",
-      ClockOutType: "Tim Burton",
-     
-    }
-  ]
+  async function printTCR() {
 
+    const res = await fetch(Link+"api/v1/user/getprofile", {
+      method: "GET",
+      headers: { jwt_token: localStorage.token }
+    });
+
+    const parseRes = await res.json();
+
+    if((parseRes.res[0][0].NAME === '' || parseRes.res[0][0].NAME === null) || (parseRes.res[0][0].BADGENUMBER === '' || parseRes.res[0][0].BADGENUMBER === null) || (parseRes.res[0][0].HIREDDAY === '' || parseRes.res[0][0].HIREDDAY === null) || (parseRes.res[0][0].DEPT === '' || parseRes.res[0][0].DEPT === null) || (parseRes.res[0][0].TITLE === '' || parseRes.res[0][0].TITLE === null))
+    {
+        toast.error('Please complete User Profile under "User" tab!',{
+        position: toast.POSITION.TOP_CENTER
+        });
+        return false;
+    }
+
+    window.open('http://10.168.2.8/hr/print/checkinout.php?idno='+user.idno+'&start='+moment(start).format("YYYY-MM-DD")+'&end='+moment(end).format("YYYY-MM-DD")+"&ccode="+user.com);
+  }
   
   
   return (
@@ -223,7 +250,6 @@ export const BioLogs = (props) => {
                     </Col>
                     <Col md={9} className="">
                       <Datetime
-                        timeFormat={true}
                         onChange={setStart}
                         renderInput={(props, openCalendar, closeCalendar) => (
                           <InputGroup>
@@ -231,7 +257,7 @@ export const BioLogs = (props) => {
                             <Form.Control
                               required
                               type="text"
-                              value={start ? moment(start).format("YYYY-MM-DD HH:mm:ss") : ""}
+                              value={start ? moment(start).format("YYYY-MM-DD") : ""}
                               placeholder="YYYY-MM-DD"
                               onFocus={openCalendar}
                               onChange={closeCalendar}  
@@ -251,7 +277,6 @@ export const BioLogs = (props) => {
                     </Col>
                     <Col md={9} className="">
                       <Datetime
-                        timeFormat={true}
                         onChange={setEnd}
                         renderInput={(props, openCalendar) => (
                           <InputGroup>
@@ -259,7 +284,7 @@ export const BioLogs = (props) => {
                             <Form.Control
                               required
                               type="text"
-                              value={end ? moment(end).format("YYYY-MM-DD HH:mm:ss") : ""}
+                              value={end ? moment(end).format("YYYY-MM-DD") : ""}
                               placeholder="YYYY-MM-DD"
                               onFocus={openCalendar}
                               onChange={() => { }} />
@@ -291,26 +316,28 @@ export const BioLogs = (props) => {
             table="table-to-xls"
             filename="Biometrics Logs"
             buttonText="Export Data"/>
+
+          <Button variant="tertiary" type="button" className="w-70" style={{float: 'right'}} onClick={printTCR} >
+            <FontAwesomeIcon icon={faPrint} />  Print TCR
+          </Button>
           <Table responsive className="table-centered table-nowrap rounded mb-0" id="table-to-xls">
             <thead className="thead-light">
               <tr>
-                <th className="border-0">ID Number</th>
                 <th className="border-0">Date</th>
                 <th className="border-0">Time In</th>
-                <th className="border-0">Time In Transaction Type</th>
                 <th className="border-0">Time Out</th>
-                <th className="border-0">Time Out Transaction Type</th>
+                <th className="border-0">Transaction Type</th>
+                <th className="border-0">Details</th>
               </tr>
             </thead>
             <tbody>
                 {logs.map((log,i) =>
                   <tr key={i}>
-                    <td>{log.BADGENUMBER}</td>
                     <td>{log.Date}</td>
                     <td>{log.ClockIn !== "" ? log.ClockIn : ""}</td>
-                    <td>{log.ClockInType}</td>
                     <td>{log.ClockOut !== "" ? log.ClockOut : ""}</td>
-                    <td>{log.ClockOutType}</td>
+                    <td>{log.TransactionType}</td>
+                    <td>{log.Details}</td>
                   </tr>
                 )}
             </tbody>

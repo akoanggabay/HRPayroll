@@ -1,11 +1,14 @@
-import { faCalendarAlt, faClock, faEdit, faEllipsisH, faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt, faClock, faEdit, faEllipsisH, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, ButtonGroup, Card, Col, Dropdown, Form, InputGroup, Modal, Row, Table } from '@themesberg/react-bootstrap';
 import moment from "moment-timezone";
 import React, { useEffect, useState } from "react";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import Datetime from "react-datetime";
 import { useSelector } from 'react-redux';
 import { toast } from "react-toastify";
+import { Link } from "../../link";
 
 export default () => {
 
@@ -15,12 +18,22 @@ const [start, setStart] = useState();
 const [end, setEnd] = useState();
 const [starttime, setStartTime] = useState();
 const [endtime, setEndTime] = useState();
+const [type, setType] = useState([]);
 const [showModal, setShowModal] = useState(false);
 const handleClose = () => setShowModal(false);
+const [confirm, setConfirm] = useState(false);
+const [trans, setTrans] = useState();
 
 const [inputs, setInputs] = useState({
     details: "",
-    remarks:""
+    remarks:"",
+    transtype:"",
+});
+
+const [editinputs, setEditInputs] = useState({
+    edetails:"",
+    eremarks:"",
+    etransno:""
 });
 
 const [reqs, setReqs] = useState([]);
@@ -35,12 +48,17 @@ const onChange = e =>
     setCheckfield({ ...checkfield, [e.target.name]: { valid: !e.target.value ? {isInvalid: true,type:"invalid"} : {isValid: true,type:"valid"} } })
 );
 
+const EonChange = e =>
+    setEditInputs({ ...editinputs, [e.target.name]: e.target.value },
+    setCheckfield({ ...checkfield, [e.target.name]: { valid: !e.target.value ? {isInvalid: true,type:"invalid"} : {isValid: true,type:"valid"} } })
+);
+
 const onSubmitForm = async e => {
     e.preventDefault();
 
     try 
         {
-            alert(moment.duration(end.diff(start)).asDays())
+            //alert(moment.duration(end.diff(start)).asDays())
         const othours = moment(end,"YYYY-MM-DD HH:mm").diff(start)
         //alert(moment(date + " "+ start).format("YYYY-MM-DD hh:mm a") + " "+moment(start).format("hh:mm a"))
         if(moment(starttime).format("HH:mm") > moment(endtime).format("HH:mm"))
@@ -68,9 +86,10 @@ const onSubmitForm = async e => {
                         timeto: moment(endtime).format("HH:mm:ss"),
                         details: inputs.details,
                         remarks:inputs.remarks,
-                        nod: moment.duration(end.diff(start)).asDays()
+                        nod: moment.duration(end.diff(start)).asDays(),
+                        type: inputs.transType
                     };
-        const response = await fetch(link+"api/v1/request/obaddrequest",
+        const response = await fetch(Link+"api/v1/request/addrequest",
         {
             method: "POST",
             headers: { jwt_token: localStorage.token,"Content-type": "application/json" },
@@ -78,16 +97,12 @@ const onSubmitForm = async e => {
         }
         );
 
-        setInputs({
-        details:"",
-        remarks:""
-        })
 
         const parseRes = await response.json();
-
+        console.log(parseRes);
         if(response.status == 505)
         {
-            toast.error(parseRes,{
+            toast.error(parseRes.alert,{
                 position: toast.POSITION.TOP_CENTER,
             });
             return false;
@@ -97,9 +112,20 @@ const onSubmitForm = async e => {
         //console.log(response.status);
         if(parseRes.status == 200)
         {
-        toast.success(parseRes.alert,{
-            position: toast.POSITION.TOP_CENTER
-        });
+            setInputs({
+                details:"",
+                remarks:"",
+                transtype:""
+            })
+            setStartTime("");
+            setEndTime("");
+            setStart("");
+            setEnd("");
+            getallreq();
+            document.getElementById("transtype").value = "";
+            toast.success(parseRes.alert,{
+                position: toast.POSITION.TOP_CENTER
+            });
         }
         else if(parseRes.status == 505)
         {
@@ -121,37 +147,218 @@ const onSubmitForm = async e => {
 };
 
 async function getallreq() {
-    //console.log(user.idno)
-    try {
     
-        const res = await fetch(link+"api/v1/request/obgetallrequest", {
+      //console.log(user.idno)
+      try {
+        
+          const res = await fetch(Link+"api/v1/request/getallrequest", {
+          method: "GET",
+          headers: { jwt_token: localStorage.token }
+          });
+
+        if(res.status === 403)
+        {
+            toast.error('Invalid Request!',{
+                position: toast.POSITION.TOP_CENTER
+            });
+            return false;
+        }
+        const parseRes = await res.json();
+        //console.log(parseRes.res);
+        setReqs(parseRes.res);
+        
+      } catch (err) {
+        //console.error(err.message);
+      }
+    
+    
+  };
+
+  const gettype = async () => {
+    try {
+      const res = await fetch(Link+"api/v1/dropdown/transaction", {
         method: "GET",
         headers: { jwt_token: localStorage.token }
-        });
-
-    if(res.status === 403)
-    {
-        toast.error('Invalid Request!',{
-            position: toast.POSITION.TOP_CENTER
-        });
-        return false;
-    }
-    const parseRes = await res.json();
-    //console.log(parseRes.res);
-    setReqs(parseRes.res);
-    
+      });
+      
+      const parseRes = await res.json();
+      //console.log(parseRes);
+      setType(parseRes.res);
+      
     } catch (err) {
-    //console.error(err.message);
+      console.error(err.message);
     }
-};
+  };
 
-  const test = async e => {
+  let typelist = type.length > 0
+    && type.map((item, i) => {
+  return (
+    <option key={i} value={item.code}>{item.description}</option>
+  )});
+
+  const Edit = async e => {
       //alert(e.target.name)
       setShowModal(true)
+      try {
+        const res = await fetch(Link+"api/v1/request/getdetails/"+e.target.name, {
+          method: "GET",
+          headers: { jwt_token: localStorage.token }
+        });
+        
+        const parseRes = await res.json();
+        setEditInputs({
+            edetails:parseRes.res[0][0].details,
+            eremarks:parseRes.res[0][0].remarks,
+            etransno:parseRes.res[0][0].transno
+        })
+        
+      } catch (err) {
+        console.error(err.message);
+      }
+      
+  }
+
+  const conf = async (e) => {
+    /* if (window.confirm("Delete the item?")) {
+        
+      } */
+
+    setTrans(e.target.name);
+    const c = confirmAlert({
+        title: e.target.name,
+        message: 'Are you sure you want to Remove this?',
+        buttons: [
+          {
+            label: 'YES',
+            onClick: async () => {
+        
+                //alert(document.getElementById("trans").value)
+                try 
+                    {
+                    
+                    const response = await fetch(Link+"api/v1/request/removedetails/"+document.getElementById("trans").value,
+                    {
+                        method: "PUT",
+                        headers: { jwt_token: localStorage.token,"Content-type": "application/json" },
+                    }
+                    );
+
+
+                    const parseRes = await response.json();
+
+                    if(response.status == 505)
+                    {
+                        toast.error(parseRes,{
+                            position: toast.POSITION.TOP_CENTER,
+                        });
+                        return false;
+                    }
+                    
+                    
+                    //console.log(response.status);
+                    if(parseRes.status == 200)
+                    {
+                        setTrans("")
+                        handleClose()
+                        getallreq();
+                        toast.success(parseRes.alert,{
+                            position: toast.POSITION.TOP_CENTER
+                        });
+                    }
+                    else if(parseRes.status == 505)
+                    {
+                    toast.error(parseRes.alert,{
+                        position: toast.POSITION.TOP_CENTER,
+                    });
+                    }
+                    else
+                    {
+                    toast.error("Cannot connect to Database.",{
+                        position: toast.POSITION.TOP_CENTER
+                    });
+                    }
+                    
+                } catch (err) {
+                    console.error(err.message);
+                }
+            }
+          },
+          {
+            label: 'No',
+            onClick: () => {
+                return false
+            }
+          }
+        ]
+      });
+  }
+
+  const saveChanges = async e => { 
+    e.preventDefault();
+
+    try 
+        {
+        
+        const body = { 
+                        details: editinputs.edetails,
+                        remarks:editinputs.eremarks,
+                        transno:editinputs.etransno
+                    };
+        const response = await fetch(Link+"api/v1/request/updaterequest",
+        {
+            method: "PUT",
+            headers: { jwt_token: localStorage.token,"Content-type": "application/json" },
+            body: JSON.stringify(body)
+        }
+        );
+
+
+        const parseRes = await response.json();
+
+        if(response.status == 505)
+        {
+            toast.error(parseRes,{
+                position: toast.POSITION.TOP_CENTER,
+            });
+            return false;
+        }
+        
+        
+        //console.log(response.status);
+        if(parseRes.status == 200)
+        {
+            setEditInputs({
+                edetails:"",
+                eremarks:"",
+                etransno:""
+            })
+            handleClose()
+            getallreq();
+            toast.success(parseRes.alert,{
+                position: toast.POSITION.TOP_CENTER
+            });
+        }
+        else if(parseRes.status == 505)
+        {
+        toast.error(parseRes.alert,{
+            position: toast.POSITION.TOP_CENTER,
+        });
+        }
+        else
+        {
+        toast.error("Cannot connect to Database.",{
+            position: toast.POSITION.TOP_CENTER
+        });
+        }
+        
+    } catch (err) {
+        console.error(err.message);
+    }
   }
 
   useEffect(() => {
     getallreq();
+    gettype();
   },[]);
 
     return (
@@ -159,7 +366,7 @@ async function getallreq() {
             <div className="d-xl-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
                 <div className="d-block mb-4 mb-xl-0">
                 
-                <h4>Official Business</h4>
+                <h4>Request</h4>
                 </div>
             </div>
 
@@ -168,10 +375,22 @@ async function getallreq() {
                     <Form onSubmit={onSubmitForm}>
                         <Row className="align-items-center">
                             <Col md={12} className="">
-                                <Form.Group id="obreq" className="mb-4">
+                                <Form.Group id="req" className="mb-4">
                                     <Row className="mb-4">
                                         <Col md={1} className="">
-                                            <Form.Label>Date</Form.Label>
+                                            <Form.Label>Type *</Form.Label>
+                                        </Col>
+
+                                        <Col md={5} className="">
+                                            <Form.Select autoFocus required name="transType" id="transtype" onChange={e => onChange(e)} >
+                                                <option></option>
+                                                {typelist}
+                                            </Form.Select>
+                                        </Col>
+                                    </Row>
+                                    <Row className="mb-4">
+                                        <Col md={1} className="">
+                                            <Form.Label>Date: *</Form.Label>
                                         </Col>
 
                                         <Col md={2} className="">
@@ -223,7 +442,7 @@ async function getallreq() {
 
                                     <Row className="mb-4">
                                         <Col md={1} className="">
-                                            <Form.Label>Time</Form.Label>
+                                            <Form.Label>Time: *</Form.Label>
                                         </Col>
 
                                         <Col md={2} className="">
@@ -277,11 +496,20 @@ async function getallreq() {
 
                                     <Row>
                                         <Col md={1} className="mb-4">
-                                            <Form.Label>Details:</Form.Label>
+                                            <Form.Label>Details: *</Form.Label>
                                         </Col>
                                         <Col md={7}>
                                             <Form.Control required {...checkfield.details.valid} type="text" name="details" value={inputs.details} onChange={e => onChange(e)} />
                                             <Form.Control.Feedback type={checkfield.details.type}></Form.Control.Feedback>
+                                        </Col>
+                                    </Row>
+
+                                    <Row hidden>
+                                        <Col md={1} className="mb-4">
+                                            <Form.Label>Trans:</Form.Label>
+                                        </Col>
+                                        <Col md={7}>
+                                            <Form.Control type="text" name="trans" id="trans" value={trans} />
                                         </Col>
                                     </Row>
 
@@ -318,12 +546,12 @@ async function getallreq() {
                                         <tbody>
                                         {reqs ? reqs.map((request,i) =>{
                                             return(
-                                                <tr key={i}>
+                                                <tr key={i} value={request.transno}>
                                                     <td>{request.transno}</td>
                                                     <td>{request.datefrom ? moment(request.datefrom).subtract(8,'h').format("YYYY-MM-DD") : ""}</td>
                                                     <td>{request.dateto ? moment(request.dateto).subtract(8,'h').format("YYYY-MM-DD") : ""}</td>
-                                                    <td>{request.timefrom ? moment(request.timefrom).subtract(7.5,'h').format("hh:mm a") : ""}</td>
-                                                    <td>{request.timeto ? moment(request.timeto).subtract(7.5,'h').format("hh:mm a") : ""}</td>
+                                                    <td>{request.timefrom ? moment(request.datefrom.split("T")[0] + " " +request.timefrom.split("T")[1].split(".")[0]).format("hh:mm a") : ""}</td>
+                                                    <td>{request.timeto ? moment(request.datefrom.split("T")[0] + " " +request.timeto.split("T")[1].split(".")[0]).format("hh:mm a") : ""}</td>
                                                     <td>{request.details}</td>
                                                     <td>{request.remarks}</td>
                                                     <td>
@@ -334,13 +562,10 @@ async function getallreq() {
                                                             </span>
                                                             </Dropdown.Toggle>
                                                             <Dropdown.Menu>
-                                                            <Dropdown.Item name={request.transno} value={request.transno} onClick={ e => test(e)}>
-                                                                <FontAwesomeIcon icon={faEye} className="me-2" /> View Details
-                                                            </Dropdown.Item>
-                                                            <Dropdown.Item>
+                                                            <Dropdown.Item name={request.transno} value={request.transno} onClick={ e => Edit(e)}>
                                                                 <FontAwesomeIcon icon={faEdit} className="me-2" /> Edit
                                                             </Dropdown.Item>
-                                                            <Dropdown.Item className="text-danger">
+                                                            <Dropdown.Item name={request.transno} value={request.transno} onClick={e => conf(e)}  className="text-danger">
                                                                 <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Remove
                                                             </Dropdown.Item>
                                                             </Dropdown.Menu>
@@ -352,22 +577,55 @@ async function getallreq() {
                                     </Table>
                                 </Form.Group>
                                 <Form.Group>
-                                <Modal as={Modal.Dialog} centered show={showModal} onHide={handleClose}>
+                                <Modal as={Modal.Dialog} centered show={showModal} onHide={handleClose} size="lg">
                                     <Modal.Header>
                                         <Modal.Title className="h6">Details</Modal.Title>
                                         <Button variant="close" aria-label="Close" onClick={handleClose} />
                                     </Modal.Header>
-                                    <Modal.Body>
-                                        
-                                    </Modal.Body>
-                                    <Modal.Footer>
-                                        <Button variant="secondary" onClick={handleClose}>
-                                        I Got It
-                                    </Button>
-                                        <Button variant="link" className="text-gray ms-auto" onClick={handleClose}>
-                                        Close
-                                    </Button>
-                                    </Modal.Footer>
+                                    <Form onSubmit={saveChanges}>
+                                        <Modal.Body>
+                                            
+                                                <Form.Group>
+                                                    <Row className="align-items-center">
+                                                        <Col md={12}>
+                                                            <Row className="mb-4">
+                                                                <Col md={2}>
+                                                                    <Form.Label>Transaction #:</Form.Label>
+                                                                </Col>
+                                                                <Col md={7}>
+                                                                    <Form.Control disabled type="text" name="etransno" value={editinputs.etransno} onChange={e => onChange(e)} />
+                                                                </Col>
+                                                            </Row>
+                                                            <Row className="mb-4">
+                                                                <Col md={2}>
+                                                                    <Form.Label>Details:</Form.Label>
+                                                                </Col>
+                                                                <Col md={7}>
+                                                                    <Form.Control required type="text" name="edetails" value={editinputs.edetails} onChange={e => EonChange(e)} />
+                                                                </Col>
+                                                            </Row>
+                                                            <Row className="mb-4">
+                                                                <Col md={2}>
+                                                                    <Form.Label>Remarks:</Form.Label>
+                                                                </Col>
+                                                                <Col md={7}>
+                                                                    <Form.Control type="text" name="eremarks" value={editinputs.eremarks} onChange={e => EonChange(e)} />
+                                                                </Col>
+                                                            </Row>
+                                                        </Col>
+                                                    </Row>
+                                                </Form.Group>
+                                            
+                                        </Modal.Body>
+                                        <Modal.Footer>
+                                            <Button variant="primary" type="submit">
+                                            Save Changes
+                                        </Button>
+                                            <Button variant="link" className="text-gray ms-auto" onClick={handleClose}>
+                                            Close
+                                        </Button>
+                                        </Modal.Footer>
+                                    </Form>
                                     </Modal>
                                 </Form.Group>
                             </Col>

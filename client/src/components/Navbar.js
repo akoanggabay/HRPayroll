@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { toast } from "react-toastify";
+import { Link as API } from '../link';
 import { setLoggedInfo } from '../redux/actions/logged';
 import { setUserInfo } from '../redux/actions/user';
 
@@ -20,7 +21,7 @@ const NavigationBar = () => {
   
   const getProfile = async () => {
     try {
-      const res = await fetch("http://localhost:5000/dashboard/", {
+      const res = await fetch(API+"dashboard/", {
         method: "POST",
         headers: { jwt_token: localStorage.token }
       });

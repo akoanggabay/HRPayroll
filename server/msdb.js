@@ -6,7 +6,7 @@ const config = {
     password: "duanepogi",
     server: "10.168.2.8\\SQLexpress",
     database: "Biometrics",
-    port: 1433,
+    port: 14330,
     options: {
         encrypt: false,
     }

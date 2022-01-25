@@ -46,4 +46,58 @@ router.get("/leave", authorize ,async (req, res) => {
     }
 });
 
+router.get("/dept", authorize ,async (req, res) => {
+  try {
+      //console.log(req.user.id.com)
+      const data = await sql.request()
+        .query("SELECT * from approver where ccode = '"+req.user.id.com+"' order by dept")
+
+        
+        //console.log(data.recordsets[0])
+        return res.send({
+            res: data.recordsets[0]
+        })
+  
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server error");
+    }
+});
+
+router.get("/transaction", authorize ,async (req, res) => {
+  try {
+
+      const data = await sql.request()
+        .query("SELECT * from transactiontype where active = 1 order by description")
+
+        
+        //console.log(data.recordsets[0])
+        return res.send({
+            res: data.recordsets[0]
+        })
+  
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server error");
+    }
+});
+
+router.get("/form", authorize ,async (req, res) => {
+  try {
+      //console.log(req.user.id.com)
+      const data = await sql.request()
+        .query("SELECT * from formtype where active = 1 and ccode = '"+req.user.id.com+"' order by description")
+
+        
+        //console.log(data.recordsets[0])
+        return res.send({
+            res: data.recordsets[0]
+        })
+  
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server error");
+    }
+});
+
 module.exports = router;

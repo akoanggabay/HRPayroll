@@ -21,7 +21,7 @@ export default ({ setAuth }) => {
   const logged = useSelector(state => state.logged.info.logged);
   const dispatch = useDispatch();
   const { idno, com, password } = inputs;
-  const link = "http://10.168.1.219:5000/"
+  const link = "http://localhost:5000/"
 
   const onChange = e =>
     setInputs({ ...inputs, [e.target.name]: e.target.value });
@@ -106,7 +106,7 @@ export default ({ setAuth }) => {
               <div className="bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
                 <div className="text-center text-md-center mb-4 mt-md-0">
                   <h3 className="mb-0"><Image src={CompanyLogo} className="navbar-brand-light" style={ {height: '30px',marginRight: '10px' } } />Suhay, OPC</h3>
-                  <h3 className="mb-0">Payroll System</h3>
+                  <h3 className="mb-0">Alliance Time Meter</h3>
                 </div>
                 <Form className="mt-4" onSubmit={onSubmitForm}>
                   <Form.Group id="idno" className="mb-4">

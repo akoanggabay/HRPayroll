@@ -1,5 +1,5 @@
 
-import { faHandHoldingUsd } from "@fortawesome/free-solid-svg-icons";
+import { faClock, faFileAlt, faFolderOpen, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Accordion, Badge, Button, Dropdown, Image, Nav, Navbar } from '@themesberg/react-bootstrap';
 import React, { useState } from "react";
@@ -80,13 +80,16 @@ export default (props = {}) => {
             <Nav className="flex-column pt-3 pt-md-0">
               <NavItem title="Suhay, OPC" image={CompanyLogo} style={{ filter: 'grayscale' }} />
               <Dropdown.Divider className="my-3 border-indigo" />
-              <NavItem title="Transactions" icon={faHandHoldingUsd} link={Routes.BootstrapTables.path} />
+              <NavItem title="Time Card Report" icon={faClock} link={Routes.BootstrapTables.path} />
+              <NavItem title="Request" icon={faFileAlt} link={Routes.Req.path} />
+              
             </Nav>
-            {/* <CollapsableNavItem eventKey="components/" title="Requests" icon={faFileAlt} hidden>
-                <NavItem title="Overtime" link={Routes.OT.path} />
-                <NavItem title="Official Business" link={Routes.OB.path} />
-                <NavItem title="Leave" link={Routes.Leave.path} />
-            </CollapsableNavItem> */}
+            <CollapsableNavItem title="Forms" icon={faFolderOpen}>
+              <NavItem title="Leave" link={Routes.FormLeave.path} />
+            </CollapsableNavItem>
+            <CollapsableNavItem title="User" icon={faUser}>
+              <NavItem title="Profile" link={Routes.UserProfile.path} />
+            </CollapsableNavItem>
           </div>
         </SimpleBar>
       </CSSTransition>

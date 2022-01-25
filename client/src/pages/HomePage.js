@@ -9,11 +9,14 @@ import Sidebar from "../components/Sidebar";
 import { setLoggedInfo } from '../redux/actions/logged';
 import { Routes } from "../routes";
 import Signin from "./examples/Signin";
+import FormLeave from "./form/leave";
 import Leave from "./request/leave";
 import OB from "./request/ob";
 import OT from "./request/ot";
+import Request from "./request/request";
 // pages
 import BootstrapTables from "./tables/BootstrapTables";
+import UserProfile from "./user/profile";
 
 
 
@@ -85,16 +88,33 @@ const App = props => {
   const checkAuthenticated = async () => {
     //console.log(1)
     try {
-      const res = await fetch(link+"api/v1/auth/verify", {
-        method: "POST",
-        headers: { jwt_token: localStorage.token }
-      });
 
-      const parseRes = await res.json();
+      if(localStorage.token)
+      {
+          const res = await fetch(link+"api/v1/auth/verify", {
+          method: "POST",
+          headers: { jwt_token: localStorage.token }
+        });
+        const parseRes = await res.json();
     
-      //console.log(parseRes)
-      //parseRes === true ? setIsAuthenticated(true) : setIsAuthenticated(false);
-      parseRes === true ? dispatch(setLoggedInfo({logged: true})) : dispatch(setLoggedInfo({logged: false}))
+      
+        if(parseRes === true)
+        {
+          //console.log(parseRes);
+        }
+        else
+        {
+          toast.warning("Login session expired.",{
+            position: toast.POSITION.TOP_CENTER
+          });
+          localStorage.removeItem("token");
+        }
+        //parseRes === true ? setIsAuthenticated(true) : setIsAuthenticated(false);
+        parseRes === true ? dispatch(setLoggedInfo({logged: true})) : dispatch(setLoggedInfo({logged: false}))
+      }
+      
+
+      
       
     } catch (err) {
       console.error(err.message);
@@ -103,6 +123,7 @@ const App = props => {
 
   useEffect(() => {
     checkAuthenticated();
+    setInterval(function () {checkAuthenticated()}, 1000 * 60);
   }, []);
 
   /* const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -124,6 +145,9 @@ const App = props => {
                 <Route exact path={Routes.OT.path} render={props => logged ? ( <Fragment><Navbar/><Sidebar/><OT {...props} setAuth={logged} /><Footer/></Fragment> ) : ( <Redirect to = "/login" />)} />
                 <Route exact path={Routes.OB.path} render={props => logged ? ( <Fragment><Navbar/><Sidebar/><OB {...props} setAuth={logged} /><Footer/></Fragment> ) : ( <Redirect to = "/login" />)} />
                 <Route exact path={Routes.Leave.path} render={props => logged ? ( <Fragment><Navbar/><Sidebar/><Leave {...props} setAuth={logged} /><Footer/></Fragment> ) : ( <Redirect to = "/login" />)} />
+                <Route exact path={Routes.Req.path} render={props => logged ? ( <Fragment><Navbar/><Sidebar/><Request {...props} setAuth={logged} /><Footer/></Fragment> ) : ( <Redirect to = "/login" />)} />
+                <Route exact path={Routes.FormLeave.path} render={props => logged ? ( <Fragment><Navbar/><Sidebar/><FormLeave {...props} setAuth={logged} /><Footer/></Fragment> ) : ( <Redirect to = "/login" />)} />
+                <Route exact path={Routes.UserProfile.path} render={props => logged ? ( <Fragment><Navbar/><Sidebar/><UserProfile {...props} setAuth={logged} /><Footer/></Fragment> ) : ( <Redirect to = "/login" />)} />
               </main>
           </Route>
         </Switch>
