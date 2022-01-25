@@ -82,11 +82,9 @@ export default (props = {}) => {
               <Dropdown.Divider className="my-3 border-indigo" />
               <NavItem title="Time Card Report" icon={faClock} link={Routes.BootstrapTables.path} />
               <NavItem title="Request" icon={faFileAlt} link={Routes.Req.path} />
+              <NavItem title="Forms" icon={faFolderOpen} link={Routes.FormLeave.path} />
               
             </Nav>
-            <CollapsableNavItem title="Forms" icon={faFolderOpen}>
-              <NavItem title="Leave" link={Routes.FormLeave.path} />
-            </CollapsableNavItem>
             <CollapsableNavItem title="User" icon={faUser}>
               <NavItem title="Profile" link={Routes.UserProfile.path} />
             </CollapsableNavItem>
