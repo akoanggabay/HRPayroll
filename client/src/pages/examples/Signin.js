@@ -21,7 +21,7 @@ export default ({ setAuth }) => {
   const logged = useSelector(state => state.logged.info.logged);
   const dispatch = useDispatch();
   const { idno, com, password } = inputs;
-  const link = "http://localhost:5000/"
+  const link = "http://10.168.2.8:5000/"
 
   const onChange = e =>
     setInputs({ ...inputs, [e.target.name]: e.target.value });
