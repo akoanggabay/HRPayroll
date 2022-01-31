@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import CompanyLogo from "../../assets/img/suhay.png";
+import { Link } from "../../link";
 import { setLoggedInfo } from '../../redux/actions/logged';
 import { setUserInfo } from '../../redux/actions/user';
  
@@ -21,7 +22,8 @@ export default ({ setAuth }) => {
   const logged = useSelector(state => state.logged.info.logged);
   const dispatch = useDispatch();
   const { idno, com, password } = inputs;
-  const link = "http://10.168.2.8:5000/"
+  //const link = "http://10.168.2.8:5000/"
+  
 
   const onChange = e =>
     setInputs({ ...inputs, [e.target.name]: e.target.value });
@@ -30,7 +32,7 @@ export default ({ setAuth }) => {
       e.preventDefault();
       try {
         const body = { idno, com, password };
-        const response = await fetch(link+"api/v1/auth/login",
+        const response = await fetch(Link+"api/v1/auth/login",
           {
             method: "POST",
             headers: {
@@ -73,7 +75,7 @@ export default ({ setAuth }) => {
     };
     const getcompany = async () => {
       try {
-        const res = await fetch(link+"api/v1/dropdown/company", {
+        const res = await fetch(Link+"api/v1/dropdown/company", {
           method: "GET"
         });
         

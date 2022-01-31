@@ -7,6 +7,8 @@ const jwtGenerator = require("../utils/jwtGenerator");
 const authorize = require("../middleware/authorize");
 const sql = require("../msdb");
 
+
+
 //authorizeentication
 /* pool.connect((error) => {
   if (error) throw error;
@@ -99,5 +101,13 @@ router.get("/form", authorize ,async (req, res) => {
       res.status(500).send("Server error");
     }
 });
+
+function keepalive() {
+  pool.query('select 1', [], function(err, result) {
+    if(err) return console.log(err);
+    console.log("Still connected to Maria DB.")
+  });
+}
+setInterval(keepalive, 1000*60*60);
 
 module.exports = router;
