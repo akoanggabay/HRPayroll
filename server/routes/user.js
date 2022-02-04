@@ -25,7 +25,7 @@ router.get("/getprofile",authorize, async (req, res) => {
 router.post("/saveprofile",authorize, async (req, res) => {
     //console.log(req.body)
     try {
-        const data = await sql.query("UPDATE USERINFO set NAME = '"+req.body.name+"', TITLE = '"+req.body.title+"', HIREDDAY = '"+req.body.datehired+"', DEPT = '"+req.body.dept+"' where BADGENUMBER = '"+req.user.id.idno+"'")
+        const data = await sql.query("UPDATE USERINFO set NAME = '"+req.body.name+"', POSITION = '"+req.body.title+"', HIREDDAY = '"+req.body.datehired+"', DEPT = '"+req.body.dept+"' where BADGENUMBER = '"+req.user.id.idno+"'")
     
         if(data.rowsAffected[0] > 0)
         {

@@ -111,7 +111,7 @@ async function getprofile() {
       setInputs({
           name: parseRes.res[0][0].NAME,
           dept: parseRes.res[0][0].DEPT,
-          title: parseRes.res[0][0].TITLE
+          title: parseRes.res[0][0].POSITION
       })
       //setReqs(parseRes.res);
       

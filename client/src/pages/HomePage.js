@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 // components
 import Sidebar from "../components/Sidebar";
+import { Link } from "../link";
 import { setLoggedInfo } from '../redux/actions/logged';
 import { Routes } from "../routes";
 import Signin from "./examples/Signin";
@@ -91,7 +92,7 @@ const App = props => {
 
       if(localStorage.token)
       {
-          const res = await fetch(link+"api/v1/auth/verify", {
+          const res = await fetch(Link+"api/v1/auth/verify", {
           method: "POST",
           headers: { jwt_token: localStorage.token }
         });
