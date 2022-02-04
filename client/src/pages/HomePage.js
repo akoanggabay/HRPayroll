@@ -80,7 +80,7 @@ const App = props => {
 
   const users = useSelector(state => state.users);
   const logged = useSelector(state => state.logged.info.logged);
-  const link = "http://10.168.1.219:5000/"
+  const link = "http://10.168.2.8:5000/"
   const dispatch = useDispatch();
 
   //console.log(logged)
